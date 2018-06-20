@@ -1,6 +1,6 @@
 # Slight Framework
 
-Slight é um micro framework MVC que irá te auxiliar a desenvolver aplicações restful.
+Slight is a micro framework MVC that will assist you in the development of restful app.
 
 
 Example
@@ -23,7 +23,7 @@ use fw\ComponentController;
 class TesteController extends ComponentController {
 
 	public function teste(int $id) {
-		// Content
+	// Content
 	}
 }
 ```
