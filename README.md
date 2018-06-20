@@ -1,6 +1,6 @@
 # Slight Framework
 
-Slight is a micro framework MVC that will assist you in the development of restful app.
+Slight is an MVC framework that will assist you in the development of rest applications, containing tools for routing, authentication, and validation for data models.
 
 
 Example
