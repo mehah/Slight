@@ -3,7 +3,7 @@ namespace fw\router;
 
 final class Router {
 
-	private static $list = array();
+	private static $list = [];
 
 	public static function get(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
 		self::registerController('GET', $urlPath, $controllerClass, $methodName, $accessRule);
@@ -49,7 +49,7 @@ final class Router {
 		$config['accessRule'] = $accessRule;
 		
 		if (! ($list = &self::$list[$methodType])) {
-			$list = array();
+			$list = [];
 			self::$list[$methodType] = &$list;
 		}
 		
@@ -78,7 +78,7 @@ final class Router {
 			}
 			
 			if (! isset($last[$value])) {
-				$last[$value] = array();
+				$last[$value] = [];
 			}
 			
 			$last = &$last[$value];

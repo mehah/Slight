@@ -9,7 +9,7 @@ final class ValidationSetup implements IteratorAggregate {
 
 	public const TOTAL = 1;
 
-	private $setup = array();
+	private $setup = [];
 
 	public function register(String $propName, String $class, ...$parameters): ValidationSetup {
 		$setup = new \stdClass();

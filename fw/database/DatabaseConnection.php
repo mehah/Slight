@@ -3,7 +3,7 @@ namespace fw\database;
 
 final class DatabaseConnection {
 
-	private static $configs = Array();
+	private static $configs = [];
 
 	public static function getInstance(String $name = "default"): \PDO {
 		try {
@@ -16,13 +16,13 @@ final class DatabaseConnection {
 	}
 
 	public static function register(String $name, String $dbType, String $host, String $dbName, String $user, String $password = null, Array $options = null): void {
-		self::$configs[$name] = Array(
+		self::$configs[$name] = [
 			'dbType' => $dbType,
 			'host' => $host,
 			'dbName' => $dbName,
 			'user' => $user,
 			'password' => $password,
 			'options' => $options
-		);
+		];
 	}
 }

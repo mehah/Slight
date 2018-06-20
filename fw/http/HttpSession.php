@@ -8,7 +8,7 @@ final class HttpSession {
 
 	private $userPrincipal;
 
-	private $attr = Array();
+	private $attr = [];
 
 	public function getAttribute($index) {
 		return $this->attr[$index] ?? null;

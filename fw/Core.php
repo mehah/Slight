@@ -86,7 +86,7 @@ abstract class Core {
 		
 		$methodResult;
 		if (count($params = $reflectionMethod->getParameters()) > 0) {
-			$list = Array();
+			$list = [];
 			foreach ($params as $param) {
 				$classType = $param->getType();
 				

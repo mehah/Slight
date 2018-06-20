@@ -17,7 +17,7 @@ abstract class ComponentController {
 		$isPartial = $type === ValidationSetup::PARTIAL;
 		
 		$hasError = false;
-		$sharedData = array();
+		$sharedData = [];
 		foreach ($validation as $nameProp => $validators) {
 			foreach ($validators as $validator) {
 				$res = ($validator->className)::validate($this, $object, $nameProp, $object->{$nameProp}, $validator->parameters, $sharedData);

@@ -9,7 +9,7 @@ final class DatabaseEntity {
 		$stmt = $conn->query('SELECT * FROM ' . $className::$table);
 		
 		if ($stmt->execute()) {
-			$list = Array();
+			$list = [];
 			while ($entityDB = $stmt->fetchObject($className)) {
 				$list[] = $entityDB;
 			}
@@ -81,7 +81,7 @@ final class DatabaseEntity {
 		
 		$relationship = $entity::$relationship ?? null;
 		
-		$values = Array();
+		$values = [];
 		$fields = null;
 		$params = null;
 		$props = (new \ReflectionClass($entity))->getProperties();
@@ -126,7 +126,7 @@ final class DatabaseEntity {
 		$tableName = $entity::$table;
 		$relationship = $entity::$relationship ?? null;
 		
-		$values = Array();
+		$values = [];
 		$fields = null;
 		$params = null;
 		$props = (new \ReflectionClass($entity))->getProperties();
