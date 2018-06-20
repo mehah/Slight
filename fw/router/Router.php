@@ -48,15 +48,13 @@ final class Router {
 		$config['methodName'] = $methodName;
 		$config['accessRule'] = $accessRule;
 		
-		if (! ($list = &self::$list[$methodType])) {
-			$list = [];
-			self::$list[$methodType] = &$list;
+		$routerList = &self::$list[$methodType];
+		if (! $routerList) {
+			$routerList = [];
+			self::$list[$methodType] = &$routerList;
 		}
 		
-		$last = &$list;
-		
-		$ex = explode('/', $urlPath);
-		foreach ($ex as $i => $value) {
+		foreach (explode('/', $urlPath) as $i => $value) {
 			if (! $value) {
 				continue;
 			}
@@ -68,23 +66,23 @@ final class Router {
 				
 				$name = substr($value, 1);
 				
-				if (isset($last['$param']) && $last['$param']['name'] !== $name) {
+				if (isset($routerList['$param']) && $routerList['$param']['name'] !== $name) {
 					throw new \Exception('It is not possible to register a URL with a parameter name different from one already registered.');
 				}
 				
-				$last['$param']['name'] = $name;
-				$last = &$last['$param'];
+				$routerList['$param']['name'] = $name;
+				$routerList = &$routerList['$param'];
 				continue;
 			}
 			
-			if (! isset($last[$value])) {
-				$last[$value] = [];
+			if (! isset($routerList[$value])) {
+				$routerList[$value] = [];
 			}
 			
-			$last = &$last[$value];
+			$routerList = &$routerList[$value];
 		}
 		
-		$last['config'] = &$config;
+		$routerList['config'] = &$config;
 	}
 
 	public static function getConfig(string $url): ?array {
@@ -100,12 +98,8 @@ final class Router {
 			
 			if (isset($router[$value])) {
 				$router = $router[$value];
-			} else {
-				$param = $router['$param'];
-				if (isset($param)) {
-					$_REQUEST[$param['name']] = $value;
-					$router = $param;
-				}
+			} elseif ($router = $router['$param'] ?? null) {
+				$_REQUEST[$router['name']] = $value;
 			}
 		}
 		
