@@ -8,9 +8,7 @@ final class DatabaseEntity {
 		
 		$stmt = $conn->query('SELECT * FROM ' . $className::$table);
 		
-		$res = $stmt->execute();
-		
-		if ($res) {
+		if ($stmt->execute()) {
 			$list = Array();
 			while ($entityDB = $stmt->fetchObject($className)) {
 				$list[] = $entityDB;
@@ -44,10 +42,8 @@ final class DatabaseEntity {
 		
 		$primaryKey = $entity::$primaryKey;
 		$stmt = $conn->query('SELECT * FROM `' . $tableName . '`' . $relString . ' WHERE ' . $tableName . '.' . $primaryKey . ' = ' . $entity->{$primaryKey});
-		
-		$res = $stmt->execute();
-		
-		if ($res) {
+				
+		if ($res = $stmt->execute()) {
 			$entityDB = $stmt->fetch(\PDO::FETCH_ASSOC);
 			
 			$props = (new \ReflectionClass($entity))->getProperties();

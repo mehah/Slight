@@ -8,7 +8,7 @@ abstract class Core {
 
 	private const PATH_SRC = 'src';
 
-	public const PATH_BUILD = 'build';
+	private const PATH_BUILD = 'build';
 
 	private const PATH_PROJECT_CONFIG = self::PATH_SRC . '/config.php';
 
@@ -58,7 +58,7 @@ abstract class Core {
 		
 		if (! $config) {
 			http_response_code(404);
-			exit('PAGE NOT FOUND');
+			exit('ROUTER NOT CONFIGURED');
 		}
 		
 		$requestedMethod = $config['methodName'];
@@ -77,12 +77,10 @@ abstract class Core {
 		if (! $controller) {
 			$controller = new $controllerClass();
 			if (! ($controller instanceof ComponentController)) {
-				die('The controller ' . $controllerClass . 'need to extend the ComponentController class.');
+				exit('The controller ' . $controllerClass . 'need to extend the ComponentController class.');
 			}
 			$session[$controllerClass] = $controller;
 		}
-		
-		$reflectionClass = new \ReflectionClass($controllerClass);
 		
 		$reflectionMethod = new \ReflectionMethod($controllerClass, $requestedMethod);
 		
