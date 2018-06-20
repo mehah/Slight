@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^((?!\.).)*$ [NC]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+RewriteEngine on
+RewriteCond %{REQUEST_URI} (/src/)
+RewriteRule ^.*$ /404 [L]
