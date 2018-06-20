@@ -7,11 +7,9 @@ final class Project extends Core {
 
 	private static $chatset = 'UTF-8';
 
-	private static $checkModification = true;
+	private static $cacheRouter = false;
 
-	public static function setLiveReload($liveReload) {
-		Project::$liveReload = $liveReload;
-	}
+	private static $CONTEXT_PATH = null;
 
 	public static function getName(): string {
 		return Project::$name;
@@ -21,8 +19,12 @@ final class Project extends Core {
 		return Project::$chatset;
 	}
 
-	public static function getCheckModification(): bool {
-		return Project::$checkModification;
+	public static function cacheRouter(bool $cache): void {
+		Project::$cacheRouter = $cache;
+	}
+
+	public static function cachedRouter(): bool {
+		return Project::$cacheRouter;
 	}
 
 	public static function setName(string $name): void {
@@ -31,10 +33,6 @@ final class Project extends Core {
 
 	public static function setChatset(string $chatset): void {
 		Project::$chatset = $chatset;
-	}
-
-	public static function setCheckModification(bool $checkModification): void {
-		Project::$checkModification = $checkModification;
 	}
 
 	public static function isLocalHost() {
@@ -47,11 +45,10 @@ final class Project extends Core {
 	}
 
 	public static function getContextPath(): String {
+		if (! self::$CONTEXT_PATH) {
+			self::$CONTEXT_PATH = str_replace('\\', '/', dirname($_SERVER['PHP_SELF'])) . '/';
+		}
+		
 		return self::$CONTEXT_PATH;
 	}
-
-	public static function registerReponseCode(int $code, string $path): void {
-		parent::$pageCodeResponse[$code] = $path;
-	}
 }
-

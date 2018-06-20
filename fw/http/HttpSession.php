@@ -10,9 +10,6 @@ final class HttpSession {
 
 	private $attr = Array();
 
-	public function __construct() {
-	}
-
 	public function getAttribute($index) {
 		return $this->attr[$index] ?? null;
 	}
@@ -27,7 +24,7 @@ final class HttpSession {
 
 	public function setUserPrincipal(UserPrincipal $user) {
 		if ($this->userPrincipal != null)
-			throw new \RuntimeException("Não é possivel mudar o usuário, só quando não houver nenhum vinculado a sessão.");
+			throw new \RuntimeException("It is not possible to change the user, only when there is no linked session.");
 		
 		$this->userPrincipal = $user;
 	}

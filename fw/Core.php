@@ -3,10 +3,6 @@ namespace fw;
 
 use fw\http\HttpSession;
 use fw\router\Router;
-if (! defined('LIBXML_HTML_NODEFDTD')) {
-	define("LIBXML_HTML_NODEFDTD", 4);
-	define("LIBXML_HTML_NOIMPLIED", 8192);
-}
 
 abstract class Core {
 
@@ -15,12 +11,6 @@ abstract class Core {
 	public const PATH_BUILD = 'build';
 
 	private const PATH_PROJECT_CONFIG = self::PATH_SRC . '/config.php';
-
-	protected static $pageCodeResponse = array();
-
-	protected static $CONTEXT_PATH;
-
-	private static $template;
 
 	static function init(): void {
 		spl_autoload_register(function ($class_name) {
@@ -32,11 +22,11 @@ abstract class Core {
 		}
 		
 		if (! is_file($pathRouter = self::PATH_SRC . '/router.php')) {
-			throw new \Exception('Não foi encontrado o arquivo de configuração de routeamento em: src/router.php');
+			throw new \Exception('The route configuration file could not be found at: src/router.php');
 		}
 		
-		if (isset($_REQUEST['url'])) {
-			$APP_URL = $_REQUEST['url'];
+		if (isset($_REQUEST['$url'])) {
+			$APP_URL = $_REQUEST['$url'];
 			$APP_URL = substr($APP_URL, - 1) === '/' ? substr($APP_URL, 0, - 1) : $APP_URL;
 		} else {
 			$APP_URL = '/';
@@ -46,136 +36,96 @@ abstract class Core {
 			mkdir(self::PATH_BUILD, 0777, true);
 		}
 		
-		if (Project::getCheckModification()) {
-			include $pathRouter;
-		} else {
+		if (Project::cachedRouter()) {
 			$pathRouterSource = self::PATH_BUILD . '/router.src';
 			
-			$reflectionClass = new \ReflectionClass(Router::class);
-			$propList = $reflectionClass->getProperty('list');
+			$propList = new \ReflectionProperty(Router::class, 'list');
 			$propList->setAccessible(true);
 			
-			if (! is_file($pathRouterSource)) {
+			if (! is_file($pathRouterSource) || filemtime($pathRouter) > filemtime($pathRouterSource)) {
 				include $pathRouter;
-				$list = $propList->getValue();
-				file_put_contents($pathRouterSource, serialize($list));
+				file_put_contents($pathRouterSource, serialize($propList->getValue()));
 			} else {
 				$propList->setValue(unserialize(file_get_contents($pathRouterSource)));
 			}
 			
 			$propList->setAccessible(false);
+		} else {
+			include $pathRouter;
 		}
 		
 		$config = Router::getConfig($APP_URL);
 		
 		if (! $config) {
 			http_response_code(404);
-			if ($pagePath = self::$pageCodeResponse[404] ?? null) {
-				readfile($pagePath);
-				exit();
-			} else {
-				exit('PAGE NOT FOUND');
-			}
+			exit('PAGE NOT FOUND');
 		}
-		
-		self::$CONTEXT_PATH = str_replace('\\', '/', dirname($_SERVER['PHP_SELF'])) . '/';
 		
 		$requestedMethod = $config['methodName'];
-		$accessRule = $config['accessRule'];
 		
-		if ($accessRule && ! self::hasAccess($accessRule, $requestedMethod)) {
+		session_start();
+		if (($accessRule = $config['accessRule']) && ! self::hasAccess($accessRule, $requestedMethod)) {
 			http_response_code(401);
-			if ($pagePath = self::$pageCodeResponse[401] ?? null) {
-				readfile($pagePath);
-				exit();
-			} else {
-				exit('Você não está autorizado a executar essa ação.');
-			}
+			exit('You are not authorized to execute this action.');
 		}
 		
-		if ($controllerClass = $config['controllerClass']) {
-			$session = &self::getSession();
-			
-			$controller = $session[$controllerClass] ?? null;
-			
-			if (! $controller) {
-				$controller = new $controllerClass();
-				if (! ($controller instanceof ComponentController)) {
-					die('O controlador ' . $controllerClass . ' precisa extender a classe ComponentController.');
-				}
-				$session[$controllerClass] = $controller;
+		$controllerClass = $config['controllerClass'];
+		$session = &self::getSession();
+		
+		$controller = $session[$controllerClass] ?? null;
+		
+		if (! $controller) {
+			$controller = new $controllerClass();
+			if (! ($controller instanceof ComponentController)) {
+				die('The controller ' . $controllerClass . 'need to extend the ComponentController class.');
 			}
-			
-			$reflectionClass = new \ReflectionClass($controllerClass);
-			
-			if ($reflectionClass->hasMethod($requestedMethod)) {
-				$reflectionMethod = $reflectionClass->getMethod($requestedMethod);
+			$session[$controllerClass] = $controller;
+		}
+		
+		$reflectionClass = new \ReflectionClass($controllerClass);
+		
+		$reflectionMethod = new \ReflectionMethod($controllerClass, $requestedMethod);
+		
+		$methodResult;
+		if (count($params = $reflectionMethod->getParameters()) > 0) {
+			$list = Array();
+			foreach ($params as $param) {
+				$classType = $param->getType();
 				
-				$methodResult;
-				session_start();
-				$params = $reflectionMethod->getParameters();
-				
-				if (count($params) > 0) {
-					$list = Array();
-					foreach ($params as $param) {
-						$classType = $param->getType();
-						$paramName = $param->getName();
-						
-						if ($classType && ! $classType->isBuiltin()) {
-							$className = $classType->getName();
-							$arg = new $className();
-							self::setClassProps($_REQUEST[$paramName], $arg);
-							
-							$list[] = $arg;
-						} elseif ($arg = ($_REQUEST[$paramName] ?? null)) {
-							$list[] = $arg;
-						}
-					}
+				if ($classType && ! $classType->isBuiltin()) {
+					$arg = new $classType->getName();
+					self::setClassProps($_REQUEST[$param->getName()], $arg);
 					
-					$methodResult = $reflectionMethod->invokeArgs($controller, $list);
-				} else {
-					$methodResult = $reflectionMethod->invoke($controller);
-				}
-				
-				if ($methodResult) {
-					echo json_encode($methodResult);
+					$list[] = $arg;
+				} elseif ($arg = ($_REQUEST[$param->getName()] ?? null)) {
+					$list[] = $arg;
 				}
 			}
+			
+			$methodResult = $reflectionMethod->invokeArgs($controller, $list);
+		} else {
+			$methodResult = $reflectionMethod->invoke($controller);
 		}
 		
-		/*
-		 * $httpX = $_SERVER['HTTP_X_REQUESTED_WITH'] ?? null;
-		 * $IS_AJAX = $httpX && strtolower($httpX) === 'xmlhttprequest';
-		 */
+		if ($methodResult) {
+			echo json_encode($methodResult);
+		}
 	}
 
 	private static function hasAccess(Array $rules, String $methodName): bool {
-		$user = self::getSessionInstance()->getUserPrincipal();
-		if ($user === null) {
-			return false;
+		if (! $rules) {
+			return true;
 		}
 		
-		if (count($rules) > 0) {
-			$rule = $rules[$methodName] ?? null;
-			if (! $rule) {
-				$rule = $rules['*'] ?? null;
-			}
-			
-			if ($rule && $rule !== '*') {
-				$userRules = $user->getRules();
-				if ($userRules) {
-					foreach ($userRules as $v) {
-						if (in_array($v, $rules)) {
-							return true;
-						}
-					}
+		if ($user = self::getSessionInstance()->getUserPrincipal()) {
+			foreach ($rules as $ruleName) {
+				if (in_array($ruleName, $user->getRules())) {
+					return true;
 				}
-				
-				return false;
 			}
 		}
 		
-		return true;
+		return false;
 	}
 
 	private static function setClassProps($data, $object): void {
@@ -194,7 +144,7 @@ abstract class Core {
 	}
 
 	public static function &getSessionInstance(): HttpSession {
-		return $_SESSION[Project::getName()]['INSTANCE'];
+		return self::getSession()['INSTANCE'];
 	}
 
 	public static function &getSession(): iterable {
@@ -203,26 +153,12 @@ abstract class Core {
 			return $_SESSION[$projectName];
 		}
 		
-		$session = Array(
+		$session = [
 			'INSTANCE' => new HttpSession()
-		);
+		];
 		
 		$_SESSION[$projectName] = &$session;
 		
 		return $session;
-	}
-
-	private static function delete_files($target): void {
-		if (is_dir($target)) {
-			$files = glob($target . '*', GLOB_MARK);
-			
-			foreach ($files as $file) {
-				self::delete_files($file);
-			}
-			
-			rmdir($target);
-		} elseif (is_file($target)) {
-			unlink($target);
-		}
 	}
 }

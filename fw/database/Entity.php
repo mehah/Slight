@@ -31,4 +31,3 @@ abstract class Entity {
 		return DatabaseEntity::deleteWithFilter(get_called_class(), $fieldsFilter);
 	}
 }
-

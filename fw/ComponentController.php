@@ -6,10 +6,7 @@ use fw\validator\Validation;
 use fw\validator\ValidationSetup;
 
 abstract class ComponentController {
-
-	public function __construct() {
-	}
-
+	
 	public function getSession(): HttpSession {
 		return Core::getSessionInstance();
 	}
@@ -40,7 +37,12 @@ abstract class ComponentController {
 		
 		return new \fw\ComponentController\Validation($hasError, $sharedData);
 	}
+	
+	protected function status(int $status) {
+		http_response_code($status);
+	}
 }
+
 namespace fw\ComponentController;
 
 final class Validation {

@@ -11,7 +11,7 @@ final class DatabaseConnection {
 			
 			return new \PDO($config['dbType'] . ':host=' . $config['host'] . ';dbname=' . $config['dbName'], $config['user'], $config['password'], $config['options']);
 		} catch (\PDOException $e) {
-			throw new \Exception('Não foi possivel estabelecer uma conexão.');
+			throw new \Exception('Could not connect.');
 		}
 	}
 
@@ -26,4 +26,3 @@ final class DatabaseConnection {
 		);
 	}
 }
-?>

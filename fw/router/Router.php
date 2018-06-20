@@ -9,23 +9,23 @@ final class Router {
 		self::registerController('GET', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function post(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null) {
+	public static function post(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
 		self::registerController('POST', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function put(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null) {
+	public static function put(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
 		self::registerController('PUT', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function delete(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null) {
+	public static function delete(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
 		self::registerController('DELETE', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
-	
-	public static function patch(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null) {
+
+	public static function patch(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
 		self::registerController('PATCH', $urlPath, $controllerClass, $methodName, $accessRule);
-	}	
-	
-	public static function options(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null) {
+	}
+
+	public static function options(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
 		self::registerController('OPTIONS', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
@@ -63,13 +63,13 @@ final class Router {
 			
 			if ($value[0] === ':') {
 				if ($i === 0) {
-					throw new \Exception('Primeira caractere não pode ser um parametro.');
+					throw new \Exception('First character can not be a parameter.');
 				}
 				
 				$name = substr($value, 1);
 				
 				if (isset($last['$param']) && $last['$param']['name'] !== $name) {
-					throw new \Exception('Não possivel registrar uma URL com nome do parametro diferente de uma URL parecida.');
+					throw new \Exception('It is not possible to register a URL with a parameter name different from one already registered.');
 				}
 				
 				$last['$param']['name'] = $name;
@@ -88,31 +88,27 @@ final class Router {
 	}
 
 	public static function getConfig(string $url): ?array {
-		$router = &self::$list[$_SERVER['REQUEST_METHOD']];
+		$router = self::$list[$_SERVER['REQUEST_METHOD']];
 		if (! $router) {
 			return null;
 		}
 		
-		$last = $router;
-		$ex = explode('/', $url);
-		foreach ($ex as $i => $value) {
+		foreach (explode('/', $url) as $value) {
 			if (! $value) {
 				continue;
 			}
 			
-			if (isset($last[$value])) {
-				$last = $last[$value];
-			} else if (isset($last['$param'])) {
-				$_REQUEST[$last['$param']['name']] = $value;
-				$last = $last['$param'];
+			if (isset($router[$value])) {
+				$router = $router[$value];
+			} else {
+				$param = $router['$param'];
+				if (isset($param)) {
+					$_REQUEST[$param['name']] = $value;
+					$router = $param;
+				}
 			}
 		}
 		
-		if (! $last || ! isset($last['config'])) {
-			return null;
-		}
-		
-		return $last['config'];
+		return $router['config'] ?? null;
 	}
 }
-

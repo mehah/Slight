@@ -25,4 +25,3 @@ final class ValidationSetup implements IteratorAggregate {
 		return new \ArrayIterator($this->setup);
 	}
 }
-
