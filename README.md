@@ -19,6 +19,8 @@ Router::get('user', UserController::class, 'init', [
 ]);
 
 Router::post('user', UserController::class, 'insert');
+Router::post('user/new', UserController::class, 'insertOnSession');
+
 Router::put('user/:id/:name', UserController::class, 'update');
 ```
 
@@ -38,6 +40,8 @@ use src\model\User;
 class UserController extends ComponentController {
 
 	public function init() {
+		$this->getSession()->destroy();
+		
 		return "Hello World!";
 	}
 	
@@ -67,6 +71,10 @@ class UserController extends ComponentController {
 		return (object) [
 			'msg' => $msg
 		];
+	}
+	
+	public function insertOnSession(User $user) {
+		$this->getSession()->setUserPrincipal($user);
 	}
 }
 ```
@@ -145,25 +153,44 @@ final class RequiredValidator implements Validator {
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
 	$(function() {
-		// Test Rule
-		$.get('user');
-		
-		// Insert User
+		// ---======= TESTS =======---
+		$.ajaxSetup({
+			async : false
+		}); // TO TEST
+
+		var user = {
+			name : 'Renato'
+		};
+
+		// INSERT USER IN DATABASE
 		$.post('user', {
-			user : {
-				name : 'Renato'
-			}
+			user : user
 		}, function(data) {
 			console.log(data);
+		}).fail(function(data) {
+			console.log(data.responseText);
 		});
 
-		// Update User
+		// UPDATE USER
 		$.ajax({
 			type : 'PUT',
 			url : 'user/10/Gabriel',
 			success : function(data) {
 				console.log(data);
 			}
+		});
+
+		// TEST RULE
+		$.get('user').fail(function(data) { // UNAUTHORIZED
+			console.log(data.responseText);
+		});
+
+		$.post('user/new', {
+			user : user
+		}, function() {
+			$.get('user', function(data) {
+				console.log(data);
+			}); // AUTHORIZED
 		});
 	});
 </script>
