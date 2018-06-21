@@ -30,23 +30,19 @@ final class Router {
 	}
 
 	private static function registerController(string $methodType, string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
-		if (! $urlPath || ! $controllerClass) {
-			throw new \Exception();
+		if (filter_var('http://' . $urlPath, FILTER_VALIDATE_URL) === false) {
+			throw new \Exception('Invalid URL: ' . $urlPath);
 		}
 		
 		if (! is_file(str_replace('\\', '/', $controllerClass) . '.php')) {
-			throw new \Exception('Controlador não encontrado: ' . $controllerClass);
+			throw new \Exception('Controller not found: ' . $controllerClass);
 		}
 		
 		$reflectionClass = new \ReflectionClass($controllerClass);
 		
 		if (! $reflectionClass->hasMethod($methodName)) {
-			throw new \Exception('Método \'' . $methodName . '\' não registrado no controlador: ' . $controllerClass);
+			throw new \Exception('Method \'' . $methodName . '\' not registered in controller: ' . $controllerClass);
 		}
-		
-		$config['controllerClass'] = $controllerClass;
-		$config['methodName'] = $methodName;
-		$config['accessRule'] = $accessRule;
 		
 		$routerList = &self::$list[$methodType];
 		if (! $routerList) {
@@ -82,7 +78,11 @@ final class Router {
 			$routerList = &$routerList[$value];
 		}
 		
-		$routerList['config'] = &$config;
+		$routerList['config'] = [
+			'controllerClass' => $controllerClass,
+			'methodName' => $methodName,
+			'accessRule' => $accessRule
+		];
 	}
 
 	public static function getConfig(string $url): ?array {

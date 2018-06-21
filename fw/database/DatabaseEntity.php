@@ -174,7 +174,7 @@ final class DatabaseEntity {
 	}
 
 	public static function deleteWithFilter(string $className, Array $fieldsFilter): bool {
-		if (! $fieldsFilter || count($fieldsFilter) === 0) {
+		if (empty($fieldsFilter)) {
 			throw new \Exception("Filter fields have not been defined.");
 		}
 		

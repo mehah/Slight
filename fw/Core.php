@@ -4,8 +4,8 @@ namespace fw;
 use fw\http\HttpSession;
 use fw\router\Router;
 
-abstract class Core {
-
+final class Core {
+	
 	private const PATH_SRC = 'src';
 
 	private const PATH_BUILD = 'build';
@@ -25,8 +25,7 @@ abstract class Core {
 			throw new \Exception('The route configuration file could not be found at: src/router.php');
 		}
 		
-		if (isset($_REQUEST['$url'])) {
-			$APP_URL = $_REQUEST['$url'];
+		if ($APP_URL = $_REQUEST['$url'] ?? null) {
 			$APP_URL = substr($APP_URL, - 1) === '/' ? substr($APP_URL, 0, - 1) : $APP_URL;
 		} else {
 			$APP_URL = '/';
