@@ -86,7 +86,7 @@ final class Router {
 	}
 
 	public static function getConfig(string $url): ?array {
-		$router = self::$list[$_SERVER['REQUEST_METHOD']];
+		$router = self::$list[$_SERVER['REQUEST_METHOD']] ?? null;
 		if (! $router) {
 			return null;
 		}

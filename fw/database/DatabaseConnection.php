@@ -7,7 +7,10 @@ final class DatabaseConnection {
 
 	public static function getInstance(String $name = "default"): \PDO {
 		try {
-			$config = self::$configs[$name];
+			$config = self::$configs[$name] ?? null;
+			if($config === null) {
+				throw new \Exception('it is not possible to acquire the \''.$name.'\' configuration to be able to connect to the database.');
+			}
 			
 			return new \PDO($config['dbType'] . ':host=' . $config['host'] . ';dbname=' . $config['dbName'], $config['user'], $config['password'], $config['options']);
 		} catch (\PDOException $e) {

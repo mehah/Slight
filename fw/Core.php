@@ -5,14 +5,28 @@ use fw\http\HttpSession;
 use fw\router\Router;
 
 abstract class Core {
-	
+
 	private const PATH_SRC = 'src';
 
 	private const PATH_BUILD = 'build';
 
+	private const PATH_VIEW = 'view';
+
 	private const PATH_PROJECT_CONFIG = self::PATH_SRC . '/config.php';
 
 	static function init(): void {
+		if ($APP_URL = $_REQUEST['$url'] ?? null) {
+			$APP_URL = substr($APP_URL, - 1) === '/' ? substr($APP_URL, 0, - 1) : $APP_URL;
+		} else {
+			$viewPath = self::PATH_VIEW . '/index.html';
+			if (is_file($viewPath)) {
+				readfile($viewPath);
+				exit;
+			} else {
+				exit('PUT index.html in view folder.');
+			}
+		}
+		
 		spl_autoload_register(function ($class_name) {
 			include str_replace('\\', '/', $class_name) . '.php';
 		});
@@ -23,12 +37,6 @@ abstract class Core {
 		
 		if (! is_file($pathRouter = self::PATH_SRC . '/router.php')) {
 			throw new \Exception('The route configuration file could not be found at: src/router.php');
-		}
-		
-		if ($APP_URL = $_REQUEST['$url'] ?? null) {
-			$APP_URL = substr($APP_URL, - 1) === '/' ? substr($APP_URL, 0, - 1) : $APP_URL;
-		} else {
-			$APP_URL = '/';
 		}
 		
 		if (! is_dir(self::PATH_BUILD)) {
@@ -88,13 +96,20 @@ abstract class Core {
 			$list = [];
 			foreach ($params as $param) {
 				$classType = $param->getType();
+				$paramName = $param->getName();
+				
+				if (! isset($_REQUEST[$paramName])) {
+					throw new \Exception('Parameter \'' . $param->getName() . '\' does not exist in the request body');
+				}
 				
 				if ($classType && ! $classType->isBuiltin()) {
-					$arg = new $classType->getName();
-					self::setClassProps($_REQUEST[$param->getName()], $arg);
+					$classType = $classType->getName();
+					$arg = new $classType();
+					
+					self::setClassProps($_REQUEST[$paramName], $arg);
 					
 					$list[] = $arg;
-				} elseif ($arg = ($_REQUEST[$param->getName()] ?? null)) {
+				} elseif ($arg = ($_REQUEST[$paramName] ?? null)) {
 					$list[] = $arg;
 				}
 			}
@@ -105,6 +120,7 @@ abstract class Core {
 		}
 		
 		if ($methodResult) {
+			header('Content-type:application/json;charset=' . Project::getChatset());
 			echo json_encode($methodResult);
 		}
 	}
@@ -130,7 +146,7 @@ abstract class Core {
 		
 		foreach ($defaults as $key => $value) {
 			if (array_key_exists($key, $data)) {
-				$value = &$data->{$key};
+				$value = &$data[$key];
 				if ($_ref = $object->{$key}) {
 					self::setClassProps($value, $_ref);
 				} else {

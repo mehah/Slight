@@ -16,7 +16,7 @@ final class ValidationSetup implements IteratorAggregate {
 		$setup->className = $class;
 		$setup->parameters = $parameters;
 		
-		$this->setup->{$propName}[] = $setup;
+		$this->setup[$propName][] = $setup;
 		
 		return $this;
 	}
