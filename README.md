@@ -9,21 +9,101 @@ src/router.php
 ```php
 <?php
 use fw\router\Router;
-use src\controller\TesteController;
+use src\controller\UserController;
 
-Router::get('teste/:id', TesteController::class, 'teste');
+Router::get('user', UserController::class, 'init', [
+	'TEST_RULE'
+]);
+
+Router::post('user', UserController::class, 'insert');
+Router::put('user/:id/:name', UserController::class, 'update');
 ```
-src/controller/TesteController.php
+
+src/controller/UserController.php
 ```php
 <?php
 namespace src\controller;
 
 use fw\ComponentController;
+use src\model\User;
 
-class TesteController extends ComponentController {
+class UserController extends ComponentController {
 
-	public function teste(int $id) {
-	// Content
+	public function update($id, $name) {
+		return (object) [
+			'msg' => "User id($id) updated to name: $name"
+		];
+	}
+
+	public function insert(User $user) {
+		$msg;
+		if ($this->validate($user)->hasError()) {
+			$msg = 'Name is required.';
+		} else {
+			try {
+				if ($user->insert()) {
+					$msg = 'User inserted.';
+				} else {
+					$msg = 'Error on insert User.';
+				}
+			} catch (\Exception $e) {
+				$this->status(500);
+				$msg = $e->getMessage();
+			}
+		}
+		
+		return (object) [
+			'msg' => $msg
+		];
+	}
+}
+```
+
+src/model/User.php
+```php
+<?php
+namespace src\model;
+
+use fw\UserPrincipal;
+use fw\database\Entity;
+use fw\validator\Validation;
+use fw\validator\ValidationSetup;
+use src\validator\RequiredValidator;
+
+class User extends Entity implements Validation, UserPrincipal {
+
+	public static $table = 'users';
+
+	public static $primaryKey = 'id';
+
+	public $id;
+
+	public $name;
+
+	public static function validationSetup(ValidationSetup $setup): void {
+		$setup->register('name', RequiredValidator::class);
+	}
+
+	public function getRules(): ?array {
+		return [
+			'TEST_RULE'
+		];
+	}
+}
+```
+
+src/validator/RequiredValidator.php
+```php
+<?php
+namespace src\validator;
+
+use fw\ComponentController;
+use fw\validator\Validator;
+
+final class RequiredValidator implements Validator {
+
+	public static function validate(ComponentController $controller, object $entity, string $name, $value, array $parameters, array &$sharedData): bool {
+		return ! empty($value);
 	}
 }
 ```
