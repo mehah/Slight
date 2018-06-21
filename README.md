@@ -5,7 +5,10 @@ Slight is an MVC framework that will assist you in the development of rest appli
 
 Example
 ========
-src/router.php
+
+<details><summary>src/router.php</summary>
+<p>
+
 ```php
 <?php
 use fw\router\Router;
@@ -19,7 +22,12 @@ Router::post('user', UserController::class, 'insert');
 Router::put('user/:id/:name', UserController::class, 'update');
 ```
 
-src/controller/UserController.php
+</p>
+</details>
+
+<details><summary>src/controller/UserController.php</summary>
+<p>
+
 ```php
 <?php
 namespace src\controller;
@@ -59,7 +67,12 @@ class UserController extends ComponentController {
 }
 ```
 
-src/model/User.php
+</p>
+</details>
+
+<details><summary>src/model/User.php</summary>
+<p>
+
 ```php
 <?php
 namespace src\model;
@@ -92,7 +105,12 @@ class User extends Entity implements Validation, UserPrincipal {
 }
 ```
 
-src/validator/RequiredValidator.php
+</p>
+</details>
+
+<details><summary>src/validator/RequiredValidator.php</summary>
+<p>
+
 ```php
 <?php
 namespace src\validator;
@@ -107,6 +125,50 @@ final class RequiredValidator implements Validator {
 	}
 }
 ```
+
+</p>
+</details>
+
+<details><summary>view/index.html</summary>
+<p>
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SLIGHT</title>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+	$(function() {
+		// Test Rule
+		$.get('user');
+		
+		// Insert User
+		$.post('user', {
+			user : {
+				name : 'Renato'
+			}
+		}, function(data) {
+			console.log(data);
+		});
+
+		// Update User
+		$.ajax({
+			type : 'PUT',
+			url : 'user/10/Gabriel',
+			success : function(data) {
+				console.log(data);
+			}
+		});
+	});
+</script>
+</head>
+</html>
+```
+
+</p>
+</details>
 
 License
 -------
