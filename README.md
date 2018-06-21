@@ -37,6 +37,10 @@ use src\model\User;
 
 class UserController extends ComponentController {
 
+	public function init() {
+		return "Hello World!";
+	}
+	
 	public function update($id, $name) {
 		return (object) [
 			'msg' => "User id($id) updated to name: $name"
