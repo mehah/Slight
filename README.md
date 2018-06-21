@@ -57,11 +57,7 @@ class UserController extends ComponentController {
 			$msg = 'Name is required.';
 		} else {
 			try {
-				if ($user->insert()) {
-					$msg = 'User inserted.';
-				} else {
-					$msg = 'Error on insert User.';
-				}
+				$msg = $user->insert() ? 'User inserted.' : 'Error on insert User.';
 			} catch (\Exception $e) {
 				$this->status(500);
 				$msg = $e->getMessage();
