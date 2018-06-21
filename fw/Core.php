@@ -4,7 +4,7 @@ namespace fw;
 use fw\http\HttpSession;
 use fw\router\Router;
 
-final class Core {
+abstract class Core {
 	
 	private const PATH_SRC = 'src';
 
