@@ -19,7 +19,7 @@ final class HttpSession {
 	}
 
 	public function destroy() {
-		unset($_SESSION[Project::$name]);
+		unset($_SESSION[Project::getName()]);
 	}
 
 	public function setUserPrincipal(UserPrincipal $user) {
