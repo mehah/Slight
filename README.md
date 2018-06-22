@@ -81,7 +81,6 @@ class UserController extends ComponentController {
 
 ```php
 <?php
-<?php
 namespace src\model;
 
 use fw\UserPrincipal;
