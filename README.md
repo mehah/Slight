@@ -146,9 +146,9 @@ final class RequiredValidator implements Validator {
 <title>SLIGHT</title>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
-	$(function() {
-		var addText = (data) => $('body').append('<div>'+(data.responseJSON || data.responseText || data)+'</div>');
-		var user = {user: {name : 'Renato'}};
+	$(() => {
+		const addText = (data) => $('body').append('<div>'+(data.responseJSON || data.responseText || data)+'</div>');
+		const user = {user: {name : 'Renato'}};
 		$.ajaxSetup({ async : false });
 		
 		// ---======= TESTS =======---
