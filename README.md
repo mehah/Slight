@@ -19,7 +19,7 @@ Router::get('user', UserController::class, 'init', [
 ]);
 
 Router::post('user', UserController::class, 'insert');
-Router::post('user/new', UserController::class, 'insertOnSession');
+Router::post('user/put/session', UserController::class, 'putOnSession');
 
 Router::put('user/:id/:name', UserController::class, 'update');
 ```
@@ -44,11 +44,9 @@ class UserController extends ComponentController {
 		
 		return "Hello World!";
 	}
-	
+
 	public function update($id, $name) {
-		return (object) [
-			'msg' => "User id($id) updated to name: $name"
-		];
+		return "User id($id) updated to name: $name";
 	}
 
 	public function insert(User $user) {
@@ -64,13 +62,13 @@ class UserController extends ComponentController {
 			}
 		}
 		
-		return (object) [
-			'msg' => $msg
-		];
+		return $msg;
 	}
-	
-	public function insertOnSession(User $user) {
+
+	public function putOnSession(User $user) {
 		$this->getSession()->setUserPrincipal($user);
+		
+		return "User inserted on session.";
 	}
 }
 ```
@@ -82,6 +80,7 @@ class UserController extends ComponentController {
 <p>
 
 ```php
+<?php
 <?php
 namespace src\model;
 
@@ -101,14 +100,14 @@ class User extends Entity implements Validation, UserPrincipal {
 
 	public $name;
 
-	public static function validationSetup(ValidationSetup $setup): void {
-		$setup->register('name', RequiredValidator::class);
-	}
-
 	public function getRules(): ?array {
 		return [
 			'TEST_RULE'
 		];
+	}
+
+	public static function validationSetup(ValidationSetup $setup): void {
+		$setup->register('name', RequiredValidator::class);
 	}
 }
 ```
@@ -149,45 +148,29 @@ final class RequiredValidator implements Validator {
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
 	$(function() {
+		var addText = (data) => $('body').append('<div>'+(data.responseText || data)+'</div>');
+		var user = {user: {name : 'Renato'}};
+		$.ajaxSetup({ async : false });
+		
 		// ---======= TESTS =======---
-		$.ajaxSetup({
-			async : false
-		}); // TO TEST
-
-		var user = {
-			name : 'Renato'
-		};
-
+		
 		// INSERT USER IN DATABASE
-		$.post('user', {
-			user : user
-		}, function(data) {
-			console.log(data);
-		}).fail(function(data) {
-			console.log(data.responseText);
-		});
+		$.post('user', user).then(addText, addText);
 
 		// UPDATE USER
-		$.ajax({
-			type : 'PUT',
-			url : 'user/10/Gabriel',
-			success : function(data) {
-				console.log(data);
-			}
-		});
+		$.ajax({type: 'PUT', url: 'user/10/Gabriel'}).then(addText, addText);
 
 		// TEST RULE
-		$.get('user').fail(function(data) { // UNAUTHORIZED
-			console.log(data.responseText);
-		});
-
-		$.post('user/new', {
-			user : user
-		}, function() {
-			$.get('user', function(data) {
-				console.log(data);
-			}); // AUTHORIZED
-		});
+		{
+			$.get('user') // UNAUTHORIZED
+				.then(addText, addText);
+	
+			$.post('user/put/session', user) // PUT USER ON SESSION
+				.then(addText, addText);
+	
+			$.get('user') // NOW IS AUTHORIZED
+				.then(addText,addText);
+		}
 	});
 </script>
 </head>
