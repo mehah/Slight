@@ -1,9 +1,9 @@
 <?php
-namespace fw;
+namespace Slight;
 
-use fw\http\HttpSession;
-use fw\validator\Validation;
-use fw\validator\ValidationSetup;
+use Slight\ComponentController\Validation;
+use Slight\http\HttpSession;
+use Slight\validator\ValidationSetup;
 
 abstract class ComponentController {
 	
@@ -35,7 +35,7 @@ abstract class ComponentController {
 			}
 		}
 		
-		return new \fw\ComponentController\Validation($hasError, $sharedData);
+		return new \Slight\ComponentController\Validation($hasError, $sharedData);
 	}
 	
 	protected function status(int $status) {
@@ -43,7 +43,7 @@ abstract class ComponentController {
 	}
 }
 
-namespace fw\ComponentController;
+namespace Slight\ComponentController;
 
 final class Validation {
 

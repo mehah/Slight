@@ -11,7 +11,7 @@ Example
 
 ```php
 <?php
-use fw\router\Router;
+use Slight\router\Router;
 use src\controller\UserController;
 
 Router::get('user', UserController::class, 'init', [
@@ -34,7 +34,7 @@ Router::put('user/:id/:name', UserController::class, 'update');
 <?php
 namespace src\controller;
 
-use fw\ComponentController;
+use Slight\ComponentController;
 use src\model\User;
 
 class UserController extends ComponentController {
@@ -83,10 +83,10 @@ class UserController extends ComponentController {
 <?php
 namespace src\model;
 
-use fw\UserPrincipal;
-use fw\database\Entity;
-use fw\validator\Validation;
-use fw\validator\ValidationSetup;
+use Slight\UserPrincipal;
+use Slight\database\Entity;
+use Slight\validator\Validation;
+use Slight\validator\ValidationSetup;
 use src\validator\RequiredValidator;
 
 class User extends Entity implements Validation, UserPrincipal {
@@ -121,8 +121,8 @@ class User extends Entity implements Validation, UserPrincipal {
 <?php
 namespace src\validator;
 
-use fw\ComponentController;
-use fw\validator\Validator;
+use Slight\ComponentController;
+use Slight\validator\Validator;
 
 final class RequiredValidator implements Validator {
 

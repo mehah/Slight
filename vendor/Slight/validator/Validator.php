@@ -1,7 +1,7 @@
 <?php
-namespace fw\validator;
+namespace Slight\validator;
 
-use fw\ComponentController;
+use Slight\ComponentController;
 
 interface Validator {
 

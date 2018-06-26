@@ -1,5 +1,5 @@
 <?php
-use fw\router\Router;
+use Slight\router\Router;
 use src\controller\UserController;
 
 Router::get('user', UserController::class, 'init', [

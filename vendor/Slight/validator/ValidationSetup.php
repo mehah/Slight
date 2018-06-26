@@ -1,5 +1,5 @@
 <?php
-namespace fw\validator;
+namespace Slight\validator;
 
 use IteratorAggregate;
 

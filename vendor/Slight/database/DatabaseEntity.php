@@ -1,5 +1,5 @@
 <?php
-namespace fw\database;
+namespace Slight\database;
 
 final class DatabaseEntity {
 

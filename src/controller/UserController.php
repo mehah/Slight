@@ -1,7 +1,7 @@
 <?php
 namespace src\controller;
 
-use fw\ComponentController;
+use Slight\ComponentController;
 use src\model\User;
 
 class UserController extends ComponentController {

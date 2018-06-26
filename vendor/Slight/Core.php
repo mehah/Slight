@@ -1,8 +1,8 @@
 <?php
-namespace fw;
+namespace Slight;
 
-use fw\http\HttpSession;
-use fw\router\Router;
+use Slight\http\HttpSession;
+use Slight\router\Router;
 
 abstract class Core {
 
@@ -27,9 +27,9 @@ abstract class Core {
 			}
 		}
 		
-		spl_autoload_register(function ($class_name) {
+		/*spl_autoload_register(function ($class_name) {
 			include str_replace('\\', '/', $class_name) . '.php';
-		});
+		});*/
 		
 		if (is_file(self::PATH_PROJECT_CONFIG)) {
 			include self::PATH_PROJECT_CONFIG;

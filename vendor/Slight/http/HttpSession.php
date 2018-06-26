@@ -1,8 +1,8 @@
 <?php
-namespace fw\http;
+namespace Slight\http;
 
-use fw\Project;
-use fw\UserPrincipal;
+use Slight\Project;
+use Slight\UserPrincipal;
 
 final class HttpSession {
 

@@ -1,4 +1,4 @@
 <?php
-include 'fw/Core.php';
+require 'vendor/autoload.php';
 
-fw\Core::init();
+Slight\Core::init();

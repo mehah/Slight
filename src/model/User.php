@@ -1,10 +1,10 @@
 <?php
 namespace src\model;
 
-use fw\UserPrincipal;
-use fw\database\Entity;
-use fw\validator\Validation;
-use fw\validator\ValidationSetup;
+use Slight\UserPrincipal;
+use Slight\database\Entity;
+use Slight\validator\Validation;
+use Slight\validator\ValidationSetup;
 use src\validator\RequiredValidator;
 
 class User extends Entity implements Validation, UserPrincipal {

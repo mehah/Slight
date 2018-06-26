@@ -1,5 +1,5 @@
 <?php
-namespace fw;
+namespace Slight;
 
 final class Project extends Core {
 

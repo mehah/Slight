@@ -1,5 +1,5 @@
 <?php
-namespace fw\router;
+namespace Slight\router;
 
 final class Router {
 

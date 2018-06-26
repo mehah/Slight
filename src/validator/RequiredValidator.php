@@ -1,8 +1,8 @@
 <?php
 namespace src\validator;
 
-use fw\ComponentController;
-use fw\validator\Validator;
+use Slight\ComponentController;
+use Slight\validator\Validator;
 
 final class RequiredValidator implements Validator {
 
