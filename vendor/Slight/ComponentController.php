@@ -1,9 +1,9 @@
 <?php
 namespace Slight;
 
-use Slight\ComponentController\Validation;
 use Slight\http\HttpSession;
 use Slight\validator\ValidationSetup;
+use Slight\validator\Validation;
 
 abstract class ComponentController {
 	
