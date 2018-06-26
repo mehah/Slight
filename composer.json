@@ -1,0 +1,32 @@
+{
+	"name": "slight/slight",
+	"description":"MVC Framework",
+	"keywords": [
+        "framework",
+        "slight",
+        "light",
+		"rest",
+		"restful",
+		"router",
+		"validation",
+		"authentication",
+		"MVC"
+],
+	"type": "Project",
+	"license": "MIT",
+	"version": "1.0",
+	"authors": [
+		{
+			"name": "Renato Machado"
+		}
+	],
+	"minimum-stability": "dev",
+	"require": {
+		"php": ">=7.1.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"mehah\\Slight\\":"src/"
+		}
+	}
+}
