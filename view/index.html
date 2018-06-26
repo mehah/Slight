@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SLIGHT</title>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+	$(() => {
+		const addText = (data) => $('body').append(`<div>${data.responseJSON || data.responseText || data}</div>`);
+		const user = {user: {name : 'Renato'}};
+		$.ajaxSetup({ async : false });
+		
+		// ---======= TESTS =======---
+		
+		// INSERT USER IN DATABASE
+		$.post('user', user).then(addText, addText);
+
+		// UPDATE USER
+		$.ajax({type: 'PUT', url: 'user/10/Gabriel'}).then(addText, addText);
+
+		// TEST RULE
+		{
+			$.get('user') // UNAUTHORIZED
+				.then(addText, addText);
+	
+			$.post('user/put/session', user) // PUT USER ON SESSION
+				.then(addText, addText);
+	
+			$.get('user') // NOW IS AUTHORIZED
+				.then(addText,addText);
+		}
+	});
+</script>
+</head>
+</html>
