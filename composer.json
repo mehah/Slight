@@ -13,7 +13,7 @@
 		"MVC",
 		"api"
 	],
-	"type" : "library",
+	"type" : "project",
 	"license" : "MIT",
 	"version" : "1.0",
 	"authors" : [{
@@ -27,7 +27,7 @@
 	"autoload" : {
 		"psr-4" : {
 			"src\\" : "src",
-			"Slight\\": "Slight"
+			"Slight\\": "vendor/slight"
 		}
 	}
 }
