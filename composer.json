@@ -1,5 +1,5 @@
 {
-	"name" : "slight./framework",
+	"name" : "slight.mvc/framework",
 	"description" : "Slight is an MVC framework that will assist you in the development of rest applications, containing tools for routing, authentication and validation for data models.",
 	"keywords" : [
 		"framework",
