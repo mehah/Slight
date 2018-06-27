@@ -40,7 +40,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ view/$1 [QSA,L]
 
 RewriteEngine on
-RewriteCond %{REQUEST_URI} (/src/|/fw/|/build/)
+RewriteCond %{REQUEST_URI} (/src/|/vendor/|/build/)
 RewriteRule ^.*$ /404 [L]
 ```
 
