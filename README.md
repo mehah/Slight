@@ -23,7 +23,7 @@ composer require slight.mvc/framework:dev-master
     + ...
 + view
     * index.html
-+ <details><summary>.htaccess</summary>
+ <details><summary>.htaccess</summary>
 <p>
 
 ```htaccess
@@ -47,7 +47,7 @@ RewriteRule ^.*$ /404 [L]
 </p>
 </details>
 
-+ <details><summary>index.php</summary>
+ <details><summary>index.php</summary>
 <p>
 
 ```php
