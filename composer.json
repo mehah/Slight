@@ -1,6 +1,6 @@
 {
-	"name" : "framework/slight",
-	"description" : "MVC Framework",
+	"name" : "slight/framework",
+	"description" : "Slight is an MVC framework that will assist you in the development of rest applications, containing tools for routing, authentication and validation for data models.",
 	"keywords" : [
 		"framework",
 		"slight",
@@ -13,7 +13,7 @@
 		"MVC",
 		"api"
 	],
-	"type" : "project",
+	"type" : "library",
 	"license" : "MIT",
 	"version" : "1.0",
 	"authors" : [{
@@ -26,8 +26,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"src\\" : "src",
-			"Slight\\" : "vendor/slight"
+			"Slight\\" : "Slight"
 		}
 	}
 }

@@ -67,7 +67,7 @@ final class Router {
 					$name = substr($value, 1);
 					
 					if (isset($routerList['$param']) && $routerList['$param']['name'] !== $name) {
-						throw new \Exception('It is not possible to register a URL with a parameter name different from one already registered.');
+						throw new \Exception('It\'s not possible to register a URL with a parameter name different from one already registered.');
 					}
 					
 					$routerList['$param']['name'] = $name;

@@ -27,10 +27,6 @@ abstract class Core {
 			}
 		}
 		
-		/*spl_autoload_register(function ($class_name) {
-			include str_replace('\\', '/', $class_name) . '.php';
-		});*/
-		
 		if (is_file(self::PATH_PROJECT_CONFIG)) {
 			include self::PATH_PROJECT_CONFIG;
 		}
@@ -65,7 +61,7 @@ abstract class Core {
 		
 		if (! $config) {
 			http_response_code(404);
-			exit('ROUTER NOT CONFIGURED');
+			exit("ROUTER '$APP_URL' NOT FOUND.");
 		}
 		
 		$requestedMethod = $config['methodName'];
