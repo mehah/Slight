@@ -8,7 +8,7 @@ You can use an already ready structure that is found here: **[Sample Project](ht
 
 Or
 
-If you want to mount the ua own structure, just sweat the [Composer](https://getcomposer.org/).
+If you want to build your own structure, just sweat the [Composer](https://getcomposer.org/).
 ```shell
 composer require slight.mvc/framework:dev-master
 ```
@@ -26,7 +26,7 @@ composer require slight.mvc/framework:dev-master
  <details><summary>.htaccess</summary>
 <p>
 
-```htaccess
+```.htaccess
 RewriteEngine On
 RewriteCond %{REQUEST_URI} ^((?!\.).)*$ [NC]
 RewriteCond %{REQUEST_FILENAME} !-d
