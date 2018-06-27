@@ -7,7 +7,7 @@ Slight is an MVC framework that will assist you in the development of rest appli
 It's recommended that you use [Composer](https://getcomposer.org/) to install.
 
 ```shell
-composer require slight.mvc/framework
+composer require slight.mvc/framework:dev-master
 ```
 
 **[Sample Project](https://github.com/mehah/Slight-project)**
