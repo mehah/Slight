@@ -4,13 +4,61 @@ Slight is an MVC framework that will assist you in the development of rest appli
 
 ## Installation
 
-It's recommended that you use [Composer](https://getcomposer.org/) to install.
+You can use an already ready structure that is found here: **[Sample Project](https://github.com/mehah/Slight-project)**
 
+Or
+
+If you want to mount the ua own structure, just sweat the [Composer](https://getcomposer.org/).
 ```shell
 composer require slight.mvc/framework:dev-master
 ```
 
-**[Sample Project](https://github.com/mehah/Slight-project)**
+#### Project Structure (folders)
+                
++ src
+    * config.php
+    * router.php
+
++ vendor
+    + ...
++ view
+    * index.html
++ <details><summary>.htaccess</summary>
+<p>
+
+```htaccess
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^((?!\.).)*$ [NC]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php?$url=$1 [QSA,L]
+
+RewriteEngine On
+RewriteCond %{REQUEST_URI} \.*$
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ view/$1 [QSA,L]
+
+RewriteEngine on
+RewriteCond %{REQUEST_URI} (/src/|/fw/|/build/)
+RewriteRule ^.*$ /404 [L]
+```
+
+</p>
+</details>
+
++ <details><summary>index.php</summary>
+<p>
+
+```php
+<?php
+require 'vendor/autoload.php';
+
+Slight\Core::init();
+```
+
+</p>
+</details>
 
 License
 -------
