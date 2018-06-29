@@ -113,7 +113,7 @@ final class Router {
 				} elseif ($router = $router['$param'] ?? null) {
 					$_REQUEST[$router['name']] = $value;
 				} else {
-					break;
+					return null;
 				}
 			}
 		}
