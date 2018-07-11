@@ -1,7 +1,7 @@
 <?php
 namespace Slight\http;
 
-use Slight\Project;
+use Slight\Config;
 use Slight\UserPrincipal;
 
 final class HttpSession {
@@ -19,7 +19,7 @@ final class HttpSession {
 	}
 
 	public function destroy() {
-		unset($_SESSION[Project::getName()]);
+		unset($_SESSION[Config::getProjectName()]);
 	}
 
 	public function setUserPrincipal(UserPrincipal $user) {

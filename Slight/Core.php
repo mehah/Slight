@@ -38,7 +38,7 @@ abstract class Core {
 			mkdir(self::PATH_BUILD, 0777, true);
 		}
 		
-		if (Project::cachedRouter()) {
+		if (Config::cachedRouter()) {
 			$pathRouterSource = self::PATH_BUILD . '/router.src';
 			
 			$propList = new \ReflectionProperty(Router::class, 'list');
@@ -73,7 +73,7 @@ abstract class Core {
 		}
 		
 		$controllerClass = $router->getControllerClass();
-		if (Project::isStatefulClass($controllerClass)) {
+		if (Config::isStatefulClass($controllerClass)) {
 			$session = &self::getSession();
 			$controller = $session[$controllerClass] ?? null;
 			
@@ -97,7 +97,7 @@ abstract class Core {
 						$classType = $classType->getName();
 						$object = new $classType();
 						
-						self::stringToObject($argValue, $object);
+						self::arrayToObject($argValue, $object);
 						$argValue = $object;
 					}
 				}
@@ -111,7 +111,7 @@ abstract class Core {
 		}
 		
 		if ($methodResult !== null) {
-			header('Content-type:application/json;charset=' . Project::getChatset());
+			header('Content-type:application/json;charset=' . Config::getChatset());
 			echo json_encode($methodResult);
 		}
 	}
@@ -132,14 +132,14 @@ abstract class Core {
 		return false;
 	}
 
-	private static function stringToObject($data, $object): void {
+	private static function arrayToObject($data, $object): void {
 		$defaults = (new \ReflectionClass($object))->getDefaultProperties();
 		
 		foreach ($defaults as $key => $value) {
 			if (array_key_exists($key, $data)) {
 				$value = &$data[$key];
 				if ($_ref = $object->{$key}) {
-					self::stringToObject($value, $_ref);
+					self::arrayToObject($value, $_ref);
 				} else {
 					$object->{$key} = $value ?? null;
 				}
@@ -156,7 +156,7 @@ abstract class Core {
 			session_start();
 		}
 		
-		$projectName = Project::getName();
+		$projectName = Config::getProjectName();
 		if (isset($_SESSION[$projectName])) {
 			return $_SESSION[$projectName];
 		}
