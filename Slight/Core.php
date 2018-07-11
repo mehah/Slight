@@ -89,7 +89,7 @@ abstract class Core {
 		if (count($params = $reflectionMethod->getParameters()) > 0) {
 			$list = [];
 			foreach ($params as $param) {
-				if ($param->getClass()->getName() === HttpSession::class) {
+				if ($param->getClass() && HttpSession::class === $param->getClass()->getName()) {
 					$argValue = self::getSessionInstance();
 				} elseif ($argValue = ($_REQUEST[$param->getName()] ?? null)) {
 					$classType = $param->getType();

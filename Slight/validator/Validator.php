@@ -3,7 +3,7 @@ namespace Slight\validator;
 
 final class Validator {
 
-	public function validate(Validation $object, int $type = ValidationSetup::PARTIAL) {
+	public static function validate(Validation $object, int $type = ValidationSetup::PARTIAL) {
 		$validation = new ValidationSetup();
 		$object->validationSetup($validation);
 		$isPartial = $type === ValidationSetup::PARTIAL;
@@ -12,7 +12,7 @@ final class Validator {
 		$sharedData = [];
 		foreach ($validation as $nameProp => $validators) {
 			foreach ($validators as $validator) {
-				$res = ($validator->className)::validate($this, $object, $nameProp, $object->{$nameProp}, $validator->parameters, $sharedData);
+				$res = ($validator->className)::validate($object, $nameProp, $object->{$nameProp}, $validator->parameters, $sharedData);
 				if (! $res) {
 					$hasError = true;
 					

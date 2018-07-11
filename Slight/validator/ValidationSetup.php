@@ -12,7 +12,7 @@ final class ValidationSetup implements IteratorAggregate {
 	private $setup = [];
 
 	public function register(String $propName, String $class, ...$parameters): ValidationSetup {
-		if (! in_array(ValidatorImpl::class, class_parents($class))) {
+		if (! in_array(ValidatorImpl::class, class_implements($class))) {
 			throw new \Exception('The ' . $class . ' need to implement ValidatorImpl.');
 		}
 		
