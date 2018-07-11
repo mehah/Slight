@@ -3,7 +3,7 @@ namespace Slight\router;
 
 use Slight\http\HttpAuth;
 
-final class RouterHandler {
+final class Route {
 
 	private $controllerClass;
 

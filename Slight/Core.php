@@ -60,7 +60,7 @@ abstract class Core {
 			$APP_URL = substr($APP_URL, 0, - 1);
 		}
 		
-		$router = Router::getConfig($APP_URL);
+		$router = Router::getRoute($APP_URL);
 		
 		if (! $router) {
 			http_response_code(404);
@@ -73,7 +73,6 @@ abstract class Core {
 		}
 		
 		$controllerClass = $router->getControllerClass();
-		$controller;
 		if (Project::isStatefulClass($controllerClass)) {
 			$session = &self::getSession();
 			$controller = $session[$controllerClass] ?? null;
@@ -87,28 +86,23 @@ abstract class Core {
 		}
 		
 		$reflectionMethod = new \ReflectionMethod($controllerClass, $router->getMethodName());
-		
-		$methodResult;
 		if (count($params = $reflectionMethod->getParameters()) > 0) {
 			$list = [];
 			foreach ($params as $param) {
-				$paramName = $param->getName();
-				
-				if (! isset($_REQUEST[$paramName])) {
-					throw new \Exception('Parameter \'' . $paramName . '\' does not exist in the request body');
+				if ($param->getClass()->getName() === HttpSession::class) {
+					$argValue = self::getSessionInstance();
+				} elseif ($argValue = ($_REQUEST[$param->getName()] ?? null)) {
+					$classType = $param->getType();
+					if ($classType && ! $classType->isBuiltin()) {
+						$classType = $classType->getName();
+						$object = new $classType();
+						
+						self::stringToObject($argValue, $object);
+						$argValue = $object;
+					}
 				}
 				
-				$classType = $param->getType();
-				if ($classType && ! $classType->isBuiltin()) {
-					$classType = $classType->getName();
-					$arg = new $classType();
-					
-					self::stringToObject($_REQUEST[$paramName], $arg);
-					
-					$list[] = $arg;
-				} else {
-					$list[] = $_REQUEST[$paramName];
-				}
+				$list[] = $argValue;
 			}
 			
 			$methodResult = $reflectionMethod->invokeArgs($controller, $list);
@@ -145,7 +139,7 @@ abstract class Core {
 			if (array_key_exists($key, $data)) {
 				$value = &$data[$key];
 				if ($_ref = $object->{$key}) {
-					self::setClassProps($value, $_ref);
+					self::stringToObject($value, $_ref);
 				} else {
 					$object->{$key} = $value ?? null;
 				}

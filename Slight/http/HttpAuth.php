@@ -1,9 +1,9 @@
 <?php
 namespace Slight\http;
 
-use Slight\router\RouterHandler;
+use Slight\router\Route;
 
 interface HttpAuth {
 
-	public static function onAuthentication(RouterHandler $router): bool;
+	public static function onAuthentication(Route $router): bool;
 }

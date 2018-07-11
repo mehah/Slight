@@ -1,8 +1,6 @@
 <?php
 namespace Slight\router;
 
-use Slight\ComponentController;
-
 final class Router {
 
 	private static $list = [];
@@ -10,46 +8,36 @@ final class Router {
 	private function __construct() {
 	}
 
-	public static function get(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+	public static function get(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): Route {
 		return self::register('GET', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function post(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+	public static function post(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): Route {
 		return self::register('POST', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function put(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+	public static function put(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): Route {
 		return self::register('PUT', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function delete(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+	public static function delete(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): Route {
 		return self::register('DELETE', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function patch(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+	public static function patch(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): Route {
 		return self::register('PATCH', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function options(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+	public static function options(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): Route {
 		return self::register('OPTIONS', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	private static function register(string $methodType, string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+	private static function register(string $methodType, string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): Route {
 		if (filter_var('http://' . $urlPath, FILTER_VALIDATE_URL) === false) {
 			throw new \Exception('Invalid URL: ' . $urlPath);
 		}
 		
-		if (! class_exists($controllerClass)) {
-			throw new \Exception('Class not found: ' . $controllerClass);
-		}
-		
-		if (! in_array(ComponentController::class, class_parents($controllerClass))) {
-			throw new \Exception('The controller ' . $controllerClass . 'need to extend the ComponentController class.');
-		}
-		
-		$reflectionClass = new \ReflectionClass($controllerClass);
-		
-		if (! $reflectionClass->hasMethod($methodName)) {
+		if (! (new \ReflectionClass($controllerClass))->hasMethod($methodName)) {
 			throw new \Exception('Method \'' . $methodName . '\' not registered in controller: ' . $controllerClass);
 		}
 		
@@ -96,12 +84,12 @@ final class Router {
 			throw new \Exception("There is already a routing with the URL '$urlPath', pointing to controller('$controllerClass') and method('$methodName').");
 		}
 		
-		$router = new RouterHandler($controllerClass, $methodName, $accessRule);
+		$router = new Route($controllerClass, $methodName, $accessRule);
 		$routerList['config'] = &$router;
 		return $router;
 	}
 
-	public static function getConfig(string $url): ?RouterHandler {
+	public static function getRoute(string $url): ?Route {
 		$router = self::$list[$_SERVER['REQUEST_METHOD']] ?? null;
 		if (! $router) {
 			return null;
