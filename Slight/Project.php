@@ -11,6 +11,8 @@ final class Project extends Core {
 
 	private static $CONTEXT_PATH = null;
 
+	private static $statefullClass = null;
+
 	public static function getName(): string {
 		return Project::$name;
 	}
@@ -35,7 +37,7 @@ final class Project extends Core {
 		Project::$chatset = $chatset;
 	}
 
-	public static function isLocalHost() {
+	public static function isLocalHost(): bool {
 		$whitelist = [
 			'127.0.0.1',
 			'::1'
@@ -50,5 +52,13 @@ final class Project extends Core {
 		}
 		
 		return self::$CONTEXT_PATH;
+	}
+
+	public static function setStatefulClass(string ...$class): void {
+		self::$statefullClass = $class;
+	}
+
+	public static function isStatefulClass(string $class): bool {
+		return self::$statefullClass !== null && in_array($class, self::$statefullClass);
 	}
 }

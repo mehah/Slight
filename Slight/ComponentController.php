@@ -6,7 +6,7 @@ use Slight\validator\ValidationSetup;
 use Slight\validator\Validation;
 
 abstract class ComponentController {
-	
+
 	public function getSession(): HttpSession {
 		return Core::getSessionInstance();
 	}
@@ -25,24 +25,20 @@ abstract class ComponentController {
 					$hasError = true;
 					
 					if ($isPartial) {
-						break;
+						goto ret;
 					}
 				}
 			}
-			
-			if ($hasError && $isPartial) {
-				break;
-			}
 		}
 		
+		ret:
 		return new \Slight\ComponentController\Validation($hasError, $sharedData);
 	}
-	
+
 	protected function status(int $status) {
 		http_response_code($status);
 	}
 }
-
 namespace Slight\ComponentController;
 
 final class Validation {

@@ -5,4 +5,3 @@ interface UserPrincipal {
 
 	public function getRules(): ?Array;
 }
-

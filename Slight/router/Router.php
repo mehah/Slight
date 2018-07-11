@@ -1,41 +1,50 @@
 <?php
 namespace Slight\router;
 
+use Slight\ComponentController;
+
 final class Router {
 
 	private static $list = [];
 
-	public static function get(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
-		self::register('GET', $urlPath, $controllerClass, $methodName, $accessRule);
+	private function __construct() {
 	}
 
-	public static function post(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
-		self::register('POST', $urlPath, $controllerClass, $methodName, $accessRule);
+	public static function get(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+		return self::register('GET', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function put(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
-		self::register('PUT', $urlPath, $controllerClass, $methodName, $accessRule);
+	public static function post(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+		return self::register('POST', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function delete(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
-		self::register('DELETE', $urlPath, $controllerClass, $methodName, $accessRule);
+	public static function put(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+		return self::register('PUT', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function patch(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
-		self::register('PATCH', $urlPath, $controllerClass, $methodName, $accessRule);
+	public static function delete(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+		return self::register('DELETE', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	public static function options(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
-		self::register('OPTIONS', $urlPath, $controllerClass, $methodName, $accessRule);
+	public static function patch(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+		return self::register('PATCH', $urlPath, $controllerClass, $methodName, $accessRule);
 	}
 
-	private static function register(string $methodType, string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): void {
+	public static function options(string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
+		return self::register('OPTIONS', $urlPath, $controllerClass, $methodName, $accessRule);
+	}
+
+	private static function register(string $methodType, string $urlPath, string $controllerClass, string $methodName, array $accessRule = null): RouterHandler {
 		if (filter_var('http://' . $urlPath, FILTER_VALIDATE_URL) === false) {
 			throw new \Exception('Invalid URL: ' . $urlPath);
 		}
 		
-		if (! is_file(str_replace('\\', '/', $controllerClass) . '.php')) {
-			throw new \Exception('Controller not found: ' . $controllerClass);
+		if (! class_exists($controllerClass)) {
+			throw new \Exception('Class not found: ' . $controllerClass);
+		}
+		
+		if (! in_array(ComponentController::class, class_parents($controllerClass))) {
+			throw new \Exception('The controller ' . $controllerClass . 'need to extend the ComponentController class.');
 		}
 		
 		$reflectionClass = new \ReflectionClass($controllerClass);
@@ -87,14 +96,12 @@ final class Router {
 			throw new \Exception("There is already a routing with the URL '$urlPath', pointing to controller('$controllerClass') and method('$methodName').");
 		}
 		
-		$routerList['config'] = [
-			'controllerClass' => $controllerClass,
-			'methodName' => $methodName,
-			'accessRule' => $accessRule
-		];
+		$router = new RouterHandler($controllerClass, $methodName, $accessRule);
+		$routerList['config'] = &$router;
+		return $router;
 	}
 
-	public static function getConfig(string $url): ?array {
+	public static function getConfig(string $url): ?RouterHandler {
 		$router = self::$list[$_SERVER['REQUEST_METHOD']] ?? null;
 		if (! $router) {
 			return null;

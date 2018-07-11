@@ -15,16 +15,15 @@ abstract class Core {
 	private const PATH_PROJECT_CONFIG = self::PATH_SRC . '/config.php';
 
 	static function init(): void {
-		if ($APP_URL = $_REQUEST['$url'] ?? null) {
-			$APP_URL = substr($APP_URL, - 1) === '/' ? substr($APP_URL, 0, - 1) : $APP_URL;
-		} else {
+		$APP_URL = $_REQUEST['$url'] ?? null;
+		if (! $APP_URL) {
 			$viewPath = self::PATH_VIEW . '/index.html';
 			if (is_file($viewPath)) {
 				readfile($viewPath);
-				exit;
-			} else {
-				exit('PUT index.html in view folder.');
+				exit();
 			}
+			
+			exit('PUT index.html in view folder.');
 		}
 		
 		if (is_file(self::PATH_PROJECT_CONFIG)) {
@@ -57,56 +56,58 @@ abstract class Core {
 			include $pathRouter;
 		}
 		
-		$config = Router::getConfig($APP_URL);
+		if (substr($APP_URL, - 1) === '/') {
+			$APP_URL = substr($APP_URL, 0, - 1);
+		}
 		
-		if (! $config) {
+		$router = Router::getConfig($APP_URL);
+		
+		if (! $router) {
 			http_response_code(404);
 			exit("ROUTER '$APP_URL' NOT FOUND.");
 		}
 		
-		$requestedMethod = $config['methodName'];
-		
-		session_start();
-		if (($accessRule = $config['accessRule']) && ! self::hasAccess($accessRule, $requestedMethod)) {
+		if ($router->getAuthClass() === null && ! self::hasAccess($router->getRules(), $router->getMethodName()) || $router->getAuthClass() !== null && ! $router->getAuthClass()::onAuthentication($router)) {
 			http_response_code(401);
 			exit('You are not authorized to execute this action.');
 		}
 		
-		$controllerClass = $config['controllerClass'];
-		$session = &self::getSession();
-		
-		$controller = $session[$controllerClass] ?? null;
-		
-		if (! $controller) {
-			$controller = new $controllerClass();
-			if (! ($controller instanceof ComponentController)) {
-				exit('The controller ' . $controllerClass . 'need to extend the ComponentController class.');
+		$controllerClass = $router->getControllerClass();
+		$controller;
+		if (Project::isStatefulClass($controllerClass)) {
+			$session = &self::getSession();
+			$controller = $session[$controllerClass] ?? null;
+			
+			if (! $controller) {
+				$controller = new $controllerClass();
+				$session[$controllerClass] = $controller;
 			}
-			$session[$controllerClass] = $controller;
+		} else {
+			$controller = new $controllerClass();
 		}
 		
-		$reflectionMethod = new \ReflectionMethod($controllerClass, $requestedMethod);
+		$reflectionMethod = new \ReflectionMethod($controllerClass, $router->getMethodName());
 		
 		$methodResult;
 		if (count($params = $reflectionMethod->getParameters()) > 0) {
 			$list = [];
 			foreach ($params as $param) {
-				$classType = $param->getType();
 				$paramName = $param->getName();
 				
 				if (! isset($_REQUEST[$paramName])) {
-					throw new \Exception('Parameter \'' . $param->getName() . '\' does not exist in the request body');
+					throw new \Exception('Parameter \'' . $paramName . '\' does not exist in the request body');
 				}
 				
+				$classType = $param->getType();
 				if ($classType && ! $classType->isBuiltin()) {
 					$classType = $classType->getName();
 					$arg = new $classType();
 					
-					self::setClassProps($_REQUEST[$paramName], $arg);
+					self::stringToObject($_REQUEST[$paramName], $arg);
 					
 					$list[] = $arg;
-				} elseif ($arg = ($_REQUEST[$paramName] ?? null)) {
-					$list[] = $arg;
+				} else {
+					$list[] = $_REQUEST[$paramName];
 				}
 			}
 			
@@ -115,13 +116,13 @@ abstract class Core {
 			$methodResult = $reflectionMethod->invoke($controller);
 		}
 		
-		if ($methodResult) {
+		if ($methodResult !== null) {
 			header('Content-type:application/json;charset=' . Project::getChatset());
 			echo json_encode($methodResult);
 		}
 	}
 
-	private static function hasAccess(Array $rules, String $methodName): bool {
+	private static function hasAccess(?Array $rules, String $methodName): bool {
 		if (! $rules) {
 			return true;
 		}
@@ -137,7 +138,7 @@ abstract class Core {
 		return false;
 	}
 
-	private static function setClassProps($data, $object): void {
+	private static function stringToObject($data, $object): void {
 		$defaults = (new \ReflectionClass($object))->getDefaultProperties();
 		
 		foreach ($defaults as $key => $value) {
@@ -157,6 +158,10 @@ abstract class Core {
 	}
 
 	public static function &getSession(): iterable {
+		if (PHP_SESSION_NONE === session_status()) {
+			session_start();
+		}
+		
 		$projectName = Project::getName();
 		if (isset($_SESSION[$projectName])) {
 			return $_SESSION[$projectName];
