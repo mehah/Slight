@@ -74,7 +74,7 @@ final class Config extends Core {
 		return self::$attributes[$name];
 	}
 
-	public static function getDefaultAuthClass(): string {
+	public static function getDefaultAuthClass(): ?string {
 		return self::$defaultAuthClass;
 	}
 

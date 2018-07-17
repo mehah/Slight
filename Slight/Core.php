@@ -94,7 +94,7 @@ abstract class Core {
 			$list = [];
 			foreach ($params as $param) {
 				if ($param->getClass() && HttpSession::class === $param->getClass()->getName()) {
-					$argValue = self::getSessionInstance();
+					$argValue = &$session || HttpSession::getInstance();
 				} elseif ($argValue = ($_REQUEST[$param->getName()] ?? null)) {
 					$classType = $param->getType();
 					if ($classType && ! $classType->isBuiltin()) {
