@@ -15,6 +15,8 @@ final class Config extends Core {
 
 	private static $attributes;
 
+	private static $defaultAuthClass;
+
 	public static function getProjectName(): string {
 		return Config::$projectName;
 	}
@@ -70,5 +72,13 @@ final class Config extends Core {
 
 	public static function getAttribute(string $name) {
 		return self::$attributes[$name];
+	}
+
+	public static function getDefaultAuthClass(): string {
+		return self::$defaultAuthClass;
+	}
+
+	public static function setDefaultAuthClass(string $defaultAuthClass): void {
+		self::$defaultAuthClass = $defaultAuthClass;
 	}
 }

@@ -67,19 +67,23 @@ abstract class Core {
 			exit("ROUTER '$APP_URL' NOT FOUND.");
 		}
 		
-		if ($router->getAuthClass() === null && ! self::hasAccess($router->getRules(), $router->getMethodName()) || $router->getAuthClass() !== null && ! $router->getAuthClass()::onAuthentication($router)) {
+		$authClass = $router->getAuthClass() ?? Config::getDefaultAuthClass();
+		if ($authClass === null && ! self::hasAccess($router->getRules(), $router->getMethodName()) || $authClass !== null && ! $authClass::onAuthentication($router)) {
 			http_response_code(401);
 			exit('You are not authorized to execute this action.');
 		}
 		
 		$controllerClass = $router->getControllerClass();
 		if (Config::isStatefulClass($controllerClass)) {
-			$session = &self::getSession();
+			$session = &HttpSession::getInstance();
 			$controller = $session[$controllerClass] ?? null;
 			
-			if (! $controller) {
+			$sessionAttrName = '__'.$controllerClass;
+			if ($session->hasAttribute($sessionAttrName)) {
+				$controller = &$session->getAttribute($sessionAttrName);
+			} else {
 				$controller = new $controllerClass();
-				$session[$controllerClass] = $controller;
+				$session->setAttribute($sessionAttrName, $controller);
 			}
 		} else {
 			$controller = new $controllerClass();
@@ -145,28 +149,5 @@ abstract class Core {
 				}
 			}
 		}
-	}
-
-	public static function &getSessionInstance(): HttpSession {
-		return self::getSession()['INSTANCE'];
-	}
-
-	public static function &getSession(): iterable {
-		if (PHP_SESSION_NONE === session_status()) {
-			session_start();
-		}
-		
-		$projectName = Config::getProjectName();
-		if (isset($_SESSION[$projectName])) {
-			return $_SESSION[$projectName];
-		}
-		
-		$session = [
-			'INSTANCE' => new HttpSession()
-		];
-		
-		$_SESSION[$projectName] = &$session;
-		
-		return $session;
 	}
 }

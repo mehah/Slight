@@ -48,4 +48,8 @@ final class Route {
 	public function getRules(): ?array {
 		return $this->accessRule;
 	}
+
+	public function hasRule(string $rule): bool {
+		return $this->accessRule !== null && in_array($rule, $this->accessRule);
+	}
 }
